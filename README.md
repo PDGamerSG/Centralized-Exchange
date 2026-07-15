@@ -37,6 +37,14 @@ pub/sub, and a set of small services fan that data out to clients and storage.
 
 Prerequisites: Node 18+, Docker.
 
+**One command** (after the one-time setup below has been done once):
+
+```sh
+npm run dev:all    # starts docker infra + every service via turbo
+```
+
+**Step by step:**
+
 ```sh
 # 1. infra: redis + timescaledb
 docker compose -f docker/docker-compose.yml up -d

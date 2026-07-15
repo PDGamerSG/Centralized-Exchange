@@ -13,6 +13,17 @@ interface OpenOrder {
 }
 
 async function main() {
+    while (true) {
+        try {
+            await tick();
+        } catch (e) {
+            console.log("Market maker tick failed (is the api up?):", (e as Error).message);
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+}
+
+async function tick() {
     const price = 1000 + Math.random() * 10;
     const openOrders = await axios.get<OpenOrder[]>(
         `${BASE_URL}/api/v1/order/open?userId=${USER_ID}&market=${MARKET}`);
@@ -36,9 +47,6 @@ async function main() {
             asksToAdd--;
         }
     }
-
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    main();
 }
 
 async function placeOrder(side: "buy" | "sell", price: string) {
