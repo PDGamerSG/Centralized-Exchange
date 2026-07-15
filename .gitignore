@@ -37,6 +37,9 @@ yarn-error.log*
 .DS_Store
 *.pem
 
+# Engine state snapshots
+snapshot.json
+
 # Local-only files (not published)
 /docs/
 /Tasks.odt
