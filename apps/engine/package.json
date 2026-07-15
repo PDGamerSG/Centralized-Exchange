@@ -1,0 +1,19 @@
+{
+  "name": "engine",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "start": "cross-env WITH_SNAPSHOT=true node dist/index.js",
+    "dev": "npm run build && npm run start",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "redis": "^4.6.14"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vitest": "^1.6.0"
+  }
+}
