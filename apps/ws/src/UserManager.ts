@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { WebSocket } from "ws";
 import { User } from "./User";
 import { SubscriptionManager } from "./SubscriptionManager";
@@ -35,6 +36,6 @@ export class UserManager {
     }
 
     private getRandomId() {
-        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        return crypto.randomUUID();
     }
 }

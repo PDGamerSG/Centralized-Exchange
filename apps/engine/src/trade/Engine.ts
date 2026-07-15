@@ -1,4 +1,5 @@
 import fs from "fs";
+import crypto from "crypto";
 import { RedisManager } from "../RedisManager";
 import { ORDER_UPDATE, TRADE_ADDED } from "../types";
 import { CANCEL_ORDER, CREATE_ORDER, GET_DEPTH, GET_OPEN_ORDERS, MessageFromApi, ON_RAMP } from "../types/fromApi";
@@ -343,7 +344,7 @@ export class Engine {
     }
 
     private generateOrderId() {
-        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        return crypto.randomUUID();
     }
 
     private setBaseBalances() {

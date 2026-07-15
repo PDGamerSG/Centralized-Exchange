@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { RedisClientType, createClient } from "redis";
 import { MessageFromOrderbook } from "./types";
 import { MessageToEngine } from "./types/to";
@@ -35,6 +36,6 @@ export class RedisManager {
     }
 
     public getRandomClientId() {
-        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        return crypto.randomUUID();
     }
 }

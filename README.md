@@ -100,6 +100,10 @@ npm test --workspace=engine
 
 ## Notes
 
+- **No authentication.** `userId` is taken from the request body, so any caller can
+  act as any user — placing and cancelling orders included. Fine for a local demo;
+  before exposing this anywhere, add real auth (sessions/JWT), derive the user id
+  from the verified session, and enforce order ownership on cancel in the engine.
 - Markets are seeded with a single `TATA_INR` book and demo users `1`, `2` and `5`
   holding balances.
 - The engine snapshots its state to `snapshot.json` every 3 seconds; start it via
