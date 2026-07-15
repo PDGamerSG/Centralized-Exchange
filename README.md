@@ -1,159 +1,107 @@
-# Turborepo starter
+# Centralized Exchange
 
-This Turborepo starter is maintained by the Turborepo core team.
+A toy crypto exchange built as a turborepo monorepo. An in-memory matching engine
+processes orders that arrive over a Redis queue, publishes market data over Redis
+pub/sub, and a set of small services fan that data out to clients and storage.
 
-## Using this example
+## Architecture
 
-Run the following command:
-
-```sh
-npx create-turbo@latest
+```
+                 HTTP                    Redis queue ("messages")
+  frontend  ────────────►  api  ─────────────────────────────►  engine
+ (Next.js)                (express)                            (matching)
+     ▲                       ▲                                    │
+     │        reply on unique client-id channel (pub/sub)         │
+     │                       └────────────────────────────────────┤
+     │  websocket                                                 │
+     └───────────  ws  ◄──── depth@/trade@ channels (pub/sub) ────┤
+                                                                  │
+                db worker ◄── Redis queue ("db_processor") ───────┘
+                    │
+                    ▼
+              TimescaleDB (trades + kline materialized views)
 ```
 
-## What's inside?
+## Apps
 
-This Turborepo includes the following packages/apps:
+| App           | What it does                                                        | Port |
+| ------------- | ------------------------------------------------------------------- | ---- |
+| `apps/engine` | In-memory orderbook, balances, matching; snapshots state to disk    | –    |
+| `apps/api`    | REST API for orders, depth, klines and tickers                      | 3000 |
+| `apps/ws`     | WebSocket server streaming depth/trade updates to subscribers       | 3001 |
+| `apps/db`     | Stores trades in TimescaleDB and refreshes kline materialized views | –    |
+| `apps/mm`     | Market maker bot that keeps the TATA_INR book liquid                | –    |
+| `apps/web`    | Next.js trading UI (orderbook, candlestick chart, swap form)        | 3002 |
 
-### Apps and Packages
+## Getting started
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+Prerequisites: Node 18+, Docker.
 
 ```sh
-cd my-turborepo
-turbo build
+# 1. infra: redis + timescaledb
+docker compose -f docker/docker-compose.yml up -d
+
+# 2. dependencies
+npm install
+
+# 3. create tables and kline views
+npm run seed:db --workspace=db
+
+# 4. build everything
+npm run build
+
+# 5. run the services (each in its own terminal)
+npm run start --workspace=engine
+npm run start --workspace=api
+npm run start --workspace=ws-server
+npm run start --workspace=db
+npm run start --workspace=web      # http://localhost:3002/trade/TATA_INR
+
+# optional: fake liquidity
+npm run start --workspace=mm
 ```
 
-Without global `turbo`, use your package manager:
+## API
+
+Base URL: `http://localhost:3000/api/v1`
+
+| Method   | Path                                                | Description                     |
+| -------- | --------------------------------------------------- | ------------------------------- |
+| `POST`   | `/order`                                             | Place a limit order             |
+| `DELETE` | `/order`                                             | Cancel an order                 |
+| `GET`    | `/order/open?userId=&market=`                        | Open orders for a user          |
+| `GET`    | `/depth?symbol=`                                     | Aggregated orderbook depth      |
+| `GET`    | `/klines?symbol=&interval=&startTime=&endTime=`      | Candles (`1m`, `1h`, `1w`)      |
+
+Example:
 
 ```sh
-cd my-turborepo
-npx turbo build
-npm dlx turbo build
-npm exec turbo build
+curl -X POST http://localhost:3000/api/v1/order \
+  -H "content-type: application/json" \
+  -d '{"market":"TATA_INR","price":"1000","quantity":"1","side":"buy","userId":"1"}'
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## WebSocket
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+Connect to `ws://localhost:3001` and subscribe to channels:
+
+```json
+{ "method": "SUBSCRIBE", "params": ["depth@TATA_INR", "trade@TATA_INR"] }
+```
+
+## Tests
+
+The engine's orderbook (matching, price-time priority, partial fills, cancel,
+depth) is covered by vitest:
 
 ```sh
-turbo build --filter=docs
+npm test --workspace=engine
 ```
 
-Without global `turbo`:
+## Notes
 
-```sh
-npx turbo build --filter=docs
-npm exec turbo build --filter=docs
-npm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-npm exec turbo dev
-npm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-npm exec turbo dev --filter=web
-npm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-npm exec turbo login
-npm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-npm exec turbo link
-npm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- Markets are seeded with a single `TATA_INR` book and demo users `1`, `2` and `5`
+  holding balances.
+- The engine snapshots its state to `snapshot.json` every 3 seconds; start it via
+  `npm run start --workspace=engine` to restore from the snapshot.
+- Money math uses floats — fine for a toy exchange, not for production.
