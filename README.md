@@ -106,6 +106,19 @@ depth) is covered by vitest:
 npm test --workspace=engine
 ```
 
+## Frontend data source
+
+The web UI shows **live market data from Backpack exchange** (e.g. `SOL_USDC`):
+REST calls are proxied through the Next server (`/backpack-api` rewrite, since
+Backpack sends no CORS headers) and the depth/ticker streams come straight from
+`wss://ws.backpack.exchange`. The local engine/api/ws stack still runs the toy
+`TATA_INR` market; to point the UI at it instead, set:
+
+```sh
+NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
+NEXT_PUBLIC_WS_URL=ws://localhost:3001
+```
+
 ## Notes
 
 - **No authentication.** `userId` is taken from the request body, so any caller can

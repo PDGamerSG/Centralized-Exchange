@@ -1,8 +1,9 @@
 import axios from "axios";
 import { Depth, KLine, Ticker, Trade } from "./types";
 
-// const BASE_URL = "https://exchange-proxy.100xdevs.com/api/v1";
-const BASE_URL = "http://localhost:3000/api/v1";
+// Live Backpack exchange data, proxied through next.config.mjs rewrites.
+// Point NEXT_PUBLIC_API_URL at http://localhost:3000/api/v1 to use the local exchange instead.
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/backpack-api";
 
 export async function getTicker(market: string): Promise<Ticker> {
     const tickers = await getTickers();

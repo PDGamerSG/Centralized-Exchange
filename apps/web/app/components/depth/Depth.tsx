@@ -67,7 +67,7 @@ export function Depth({ market }: {market: string}) {
             });
         }, `DEPTH-${market}`);
         
-        SignalingManager.getInstance().sendMessage({"method":"SUBSCRIBE","params":[`depth@${market}`]});
+        SignalingManager.getInstance().sendMessage({"method":"SUBSCRIBE","params":[`depth.${market}`]});
 
         getDepth(market).then(d => {    
             setBids(d.bids.reverse());
@@ -78,7 +78,7 @@ export function Depth({ market }: {market: string}) {
         getTrades(market).then(t => setPrice(t[0].price));
 
         return () => {
-            SignalingManager.getInstance().sendMessage({"method":"UNSUBSCRIBE","params":[`depth@${market}`]});
+            SignalingManager.getInstance().sendMessage({"method":"UNSUBSCRIBE","params":[`depth.${market}`]});
             SignalingManager.getInstance().deRegisterCallback("depth", `DEPTH-${market}`);
         }
     }, [])

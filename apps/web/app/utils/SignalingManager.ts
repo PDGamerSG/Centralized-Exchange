@@ -1,7 +1,7 @@
 import { Ticker } from "./types";
 
-// export const BASE_URL = "wss://ws.backpack.exchange/"
-export const BASE_URL = "ws://localhost:3001";
+// Live Backpack stream; point NEXT_PUBLIC_WS_URL at ws://localhost:3001 to use the local exchange instead.
+export const BASE_URL = process.env.NEXT_PUBLIC_WS_URL || "wss://ws.backpack.exchange/";
 
 type Callback = (data: any) => void;
 type CallbackEntry = { callback: Callback, id: string };
