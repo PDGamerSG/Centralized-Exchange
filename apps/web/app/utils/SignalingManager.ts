@@ -38,7 +38,8 @@ export class SignalingManager {
         }
         this.ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
-            const type = message.data.e;
+            // Subscription acks have no data payload; only stream events do.
+            const type = message?.data?.e;
             if (!this.callbacks[type]) {
                 return;
             }
@@ -56,6 +57,16 @@ export class SignalingManager {
                 }
                 if (type === "depth") {
                     callback({ bids: message.data.b, asks: message.data.a });
+                }
+                if (type === "trade") {
+                    // Backpack's trade stream sends timestamps in microseconds.
+                    callback({
+                        id: message.data.t,
+                        isBuyerMaker: message.data.m,
+                        price: message.data.p,
+                        quantity: message.data.q,
+                        timestamp: Math.floor(message.data.T / 1000),
+                    });
                 }
             });
         }
