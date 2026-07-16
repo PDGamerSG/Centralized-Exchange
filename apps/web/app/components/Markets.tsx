@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Ticker } from "../utils/types";
 import { getTickers } from "../utils/httpClient";
 import { useRouter } from "next/navigation";
+import { CoinLogo, baseAsset } from "./CoinLogo";
 
 export const Markets = () => {
   const [tickers, setTickers] = useState<Ticker[]>();
@@ -44,18 +45,7 @@ function MarketRow({ market }: { market: Ticker }) {
               className="relative flex-none overflow-hidden rounded-full border border-baseBorderMed"
               style={{ width: "40px", height: "40px" }}
             >
-              <div className="relative">
-                <img
-                  alt={market.symbol}
-                  src={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVvBqZC_Q1TSYObZaMvK0DRFeHZDUtVMh08Q&s"}
-                  loading="lazy"
-                  width="40"
-                  height="40"
-                  decoding="async"
-                  data-nimg="1"
-                  className=""
-                />
-              </div>
+              <CoinLogo asset={baseAsset(market.symbol)} className="h-10 w-10" />
             </div>
             <div className="ml-4 flex flex-col">
               <p className="whitespace-nowrap text-base font-medium text-baseTextHighEmphasis">

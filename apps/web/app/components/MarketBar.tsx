@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Ticker } from "../utils/types";
 import { getTicker } from "../utils/httpClient";
 import { SignalingManager } from "../utils/SignalingManager";
+import { CoinLogo, baseAsset, quoteAsset } from "./CoinLogo";
 
 export const MarketBar = ({market}: {market: string}) => {
     const [ticker, setTicker] = useState<Ticker | null>(null);
@@ -66,8 +67,8 @@ export const MarketBar = ({market}: {market: string}) => {
 function TickerSymbol({market}: {market: string}) {
     return <div className="flex h-[60px] shrink-0 space-x-4">
         <div className="flex flex-row relative ml-2 -mr-4">
-            <img alt="SOL Logo" loading="lazy" decoding="async" data-nimg="1" className="z-10 rounded-full h-6 w-6 mt-4 outline-baseBackgroundL1"  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVvBqZC_Q1TSYObZaMvK0DRFeHZDUtVMh08Q&s" />
-            <img alt="USDC Logo" loading="lazy"decoding="async" data-nimg="1" className="h-6 w-6 -ml-2 mt-4 rounded-full" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVvBqZC_Q1TSYObZaMvK0DRFeHZDUtVMh08Q&s" />
+            <CoinLogo asset={baseAsset(market)} className="z-10 h-6 w-6 mt-4 outline-baseBackgroundL1" />
+            <CoinLogo asset={quoteAsset(market)} className="h-6 w-6 -ml-2 mt-4" />
         </div>
         <button type="button" className="react-aria-Button" data-rac="">
             <div className="flex items-center justify-between flex-row cursor-pointer rounded-lg p-3 hover:opacity-80">

@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
-
-const COIN_ICON = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVvBqZC_Q1TSYObZaMvK0DRFeHZDUtVMh08Q&s";
+import { CoinLogo, baseAsset, quoteAsset } from "./CoinLogo";
 
 export function SwapUI({ market }: {market: string}) {
     const [price, setPrice] = useState('');
@@ -39,7 +38,7 @@ export function SwapUI({ market }: {market: string}) {
                                 <input step="0.01" placeholder="0" className="h-12 rounded-lg border-2 border-solid border-baseBorderLight bg-[var(--background)] pr-12 text-right text-2xl leading-9 text-[$text] placeholder-baseTextMedEmphasis ring-0 transition focus:border-accentBlue focus:ring-0" type="text" value={price} onChange={(e) => setPrice(e.target.value)} />
                                 <div className="flex flex-row absolute right-1 top-1 p-2">
                                     <div className="relative">
-                                        <img src={COIN_ICON} className="w-6 h-6 rounded-full" />
+                                        <CoinLogo asset={quoteAsset(market)} className="w-6 h-6" />
                                     </div>
                                 </div>
                             </div>
@@ -53,7 +52,7 @@ export function SwapUI({ market }: {market: string}) {
                             <input step="0.01" placeholder="0" className="h-12 rounded-lg border-2 border-solid border-baseBorderLight bg-[var(--background)] pr-12 text-right text-2xl leading-9 text-[$text] placeholder-baseTextMedEmphasis ring-0 transition focus:border-accentBlue focus:ring-0" type="text" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
                             <div className="flex flex-row absolute right-1 top-1 p-2">
                                 <div className="relative">
-                                    <img src={COIN_ICON} className="w-6 h-6 rounded-full" />
+                                    <CoinLogo asset={baseAsset(market)} className="w-6 h-6" />
                                 </div>
                             </div>
                         </div>
