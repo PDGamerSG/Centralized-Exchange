@@ -5,7 +5,8 @@ services:
     ports:
       # Host port 5433: a native PostgreSQL install on Windows commonly owns
       # 5432 and silently intercepts connections meant for this container.
-      - "5433:5432"
+      # Loopback-only: dev credentials must not be reachable from the LAN.
+      - "127.0.0.1:5433:5432"
     environment:
       POSTGRES_DB: exchange
       POSTGRES_USER: exchange
@@ -17,7 +18,8 @@ services:
     image: redis:7-alpine
     container_name: exchange-redis
     ports:
-      - "6379:6379"
+      # Loopback-only: this Redis runs without auth.
+      - "127.0.0.1:6379:6379"
 
 volumes:
   timescale-data:
