@@ -41,7 +41,7 @@ export const MarketBar = ({market}: {market: string}) => {
                         </div>
                         <div className="flex flex-col">
                             <p className={`font-medium text-xs text-slate-400 text-sm`}>24H Change</p>
-                            <p className={` text-sm font-medium tabular-nums leading-5 text-sm text-greenText ${Number(ticker?.priceChange) > 0 ? "text-green-500" : "text-red-500"}`}>{Number(ticker?.priceChange) > 0 ? "+" : ""} {ticker?.priceChange} {Number(ticker?.priceChangePercent)?.toFixed(2)}%</p></div><div className="flex flex-col">
+                            <p className={` text-sm font-medium tabular-nums leading-5 text-sm text-greenText ${Number(ticker?.priceChange) > 0 ? "text-green-500" : "text-red-500"}`}>{Number(ticker?.priceChange) > 0 ? "+" : ""} {ticker?.priceChange} {(Number(ticker?.priceChangePercent) * 100).toFixed(2)}%</p></div><div className="flex flex-col">
                                 <p className="font-medium text-xs text-slate-400 text-sm">24H High</p>
                                 <p className="text-sm font-medium tabular-nums leading-5 text-sm ">{ticker?.high}</p>
                                 </div>

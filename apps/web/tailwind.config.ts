@@ -19,6 +19,11 @@ const config: Config = {
         baseBackgroundL3: "rgb(32,33,39)",
         greenPrimaryButtonBackground: "rgb(0,194,120)",
         baseBackgroundL1: "rgb(20,21,27)",
+        baseTextHighEmphasis: "rgb(244,244,246)",
+        baseTextMedEmphasis: "rgb(129,136,155)",
+        greenText: "rgb(0,194,120)",
+        redText: "rgb(234,56,59)",
+        accentBlue: "rgb(76,148,255)",
       },
       borderColor: {
         redBorder: 'rgba(234,56,59,.5)',
@@ -26,6 +31,7 @@ const config: Config = {
         baseBorderMed: '#cccccc',
         accentBlue: "rgb(76,148,255)",
         baseBorderLight: "rgb(32,33,39)",
+        baseBorderFocus: "rgb(129,136,155)",
         baseTextHighEmphasis: "rgb(244,244,246)"
       },
       backgroundImage: {

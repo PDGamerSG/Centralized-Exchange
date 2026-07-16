@@ -9,7 +9,12 @@ export const Markets = () => {
   const [tickers, setTickers] = useState<Ticker[]>();
 
   useEffect(() => {
-    getTickers().then((m) => setTickers(m));
+    // The first proxied request after a cold server start can time out,
+    // so keep polling: it retries failures and keeps prices fresh.
+    const load = () => getTickers().then((m) => setTickers(m)).catch(() => {});
+    load();
+    const timer = setInterval(load, 10 * 1000);
+    return () => clearInterval(timer);
   }, []);
 
   return (
@@ -18,7 +23,9 @@ export const Markets = () => {
         <div className="flex flex-col w-full rounded-lg bg-baseBackgroundL1 px-5 py-3">
           <table className="w-full table-auto">
             <MarketHeader />
-            {tickers?.map((m) => <MarketRow key={m.symbol} market={m} />)}
+            <tbody>
+              {tickers?.map((m) => <MarketRow key={m.symbol} market={m} />)}
+            </tbody>
           </table>
         </div>
       </div>
@@ -29,7 +36,7 @@ export const Markets = () => {
 function MarketRow({ market }: { market: Ticker }) {
   const router = useRouter();
   return (
-    <tr className="cursor-pointer border-t border-baseBorderLight hover:bg-white/7 w-full" onClick={() => router.push(`/trade/${market.symbol}`)}>
+    <tr className="cursor-pointer border-t border-baseBorderLight hover:bg-white/5 w-full" onClick={() => router.push(`/trade/${market.symbol}`)}>
       <td className="px-1 py-3">
         <div className="flex shrink">
           <div className="flex items-center undefined">
@@ -73,10 +80,10 @@ function MarketRow({ market }: { market: Ticker }) {
         <p className="text-base font-medium tabular-nums">{market.volume}</p>
       </td>
       <td className="px-1 py-3">
-        <p className="text-base font-medium tabular-nums text-greenText">
-          {Number(market.priceChangePercent)?.toFixed(3)} %
+        <p className={`text-base font-medium tabular-nums ${Number(market.priceChangePercent) >= 0 ? "text-green-500" : "text-red-500"}`}>
+          {(Number(market.priceChangePercent) * 100).toFixed(2)} %
         </p>
-      </td> 
+      </td>
     </tr>
   );
 }
@@ -110,9 +117,9 @@ function MarketHeader() {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 className="lucide lucide-arrow-down h-4 w-4"
               >
                 <path d="M12 5v14"></path>
