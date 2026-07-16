@@ -5,5 +5,5 @@ export const pgConfig: ClientConfig = {
     host: process.env.PGHOST || "localhost",
     database: process.env.PGDATABASE || "exchange",
     password: process.env.PGPASSWORD || "exchange",
-    port: Number(process.env.PGPORT) || 5432,
+    port: Number(process.env.PGPORT) || 5433,
 };

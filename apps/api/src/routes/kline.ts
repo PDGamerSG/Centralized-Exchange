@@ -6,7 +6,7 @@ const pgClient = new Client({
     host: process.env.PGHOST || "localhost",
     database: process.env.PGDATABASE || "exchange",
     password: process.env.PGPASSWORD || "exchange",
-    port: Number(process.env.PGPORT) || 5432,
+    port: Number(process.env.PGPORT) || 5433,
 });
 pgClient.connect().catch((err) => console.log("Failed to connect to timescaledb:", err.message));
 

@@ -3,7 +3,9 @@ services:
     image: timescale/timescaledb:latest-pg16
     container_name: exchange-timescaledb
     ports:
-      - "5432:5432"
+      # Host port 5433: a native PostgreSQL install on Windows commonly owns
+      # 5432 and silently intercepts connections meant for this container.
+      - "5433:5432"
     environment:
       POSTGRES_DB: exchange
       POSTGRES_USER: exchange
