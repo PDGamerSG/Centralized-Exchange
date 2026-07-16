@@ -67,6 +67,15 @@ export class ChartManager {
       }))
     );
   }
+  public setData(data: any[]) {
+    this.candleSeries.setData(
+      data.map((point) => ({
+        ...point,
+        time: (point.timestamp / 1000) as UTCTimestamp,
+      }))
+    );
+  }
+
   public update(updatedPrice: any) {
     if (!this.lastUpdateTime) {
       this.lastUpdateTime = new Date().getTime();
