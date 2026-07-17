@@ -8,25 +8,32 @@ export const Appbar = () => {
     const route = usePathname();
     const router = useRouter()
 
-    return <div className="text-white border-b border-slate-800">
-        <div className="flex justify-between items-center p-2">
-            <div className="flex">
-                <div className={`text-xl pl-4 flex flex-col justify-center cursor-pointer text-white`} onClick={() => router.push('/')}>
-                    Exchange
+    const linkClass = (active: boolean) =>
+        `cursor-pointer text-sm transition-colors duration-300 ${active ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground"}`;
+
+    return <header className="border-b border-border">
+        <div className="flex h-14 items-center justify-between px-6">
+            <div className="flex items-center gap-8">
+                <div className="flex cursor-pointer items-center gap-2" onClick={() => router.push('/')}>
+                    <span className="text-xl font-extrabold tracking-tighter">Exchange</span>
+                    <span className="flex items-center gap-1.5 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
+                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-up"></span>
+                        live
+                    </span>
                 </div>
-                <div className={`text-sm pt-1 flex flex-col justify-center pl-8 cursor-pointer ${route.startsWith('/markets') ? 'text-white' : 'text-slate-500'}`} onClick={() => router.push('/markets')}>
-                    Markets
-                </div>
-                <div className={`text-sm pt-1 flex flex-col justify-center pl-8 cursor-pointer ${route.startsWith('/trade') ? 'text-white' : 'text-slate-500'}`} onClick={() => router.push('/trade/SOL_USDC')}>
-                    Trade
-                </div>
+                <nav className="flex items-center gap-6">
+                    <span className={linkClass(route.startsWith('/markets'))} onClick={() => router.push('/markets')}>
+                        Markets
+                    </span>
+                    <span className={linkClass(route.startsWith('/trade'))} onClick={() => router.push('/trade/SOL_USDC')}>
+                        Trade
+                    </span>
+                </nav>
             </div>
-            <div className="flex">
-                <div className="p-2 mr-2">
-                    <SuccessButton>Deposit</SuccessButton>
-                    <PrimaryButton>Withdraw</PrimaryButton>
-                </div>
+            <div className="flex items-center gap-2">
+                <SuccessButton>Deposit</SuccessButton>
+                <PrimaryButton>Withdraw</PrimaryButton>
             </div>
         </div>
-    </div>
+    </header>
 }

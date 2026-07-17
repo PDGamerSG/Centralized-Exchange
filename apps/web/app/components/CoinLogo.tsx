@@ -18,7 +18,7 @@ export function CoinLogo({ asset, className }: { asset: string, className?: stri
     const [failed, setFailed] = useState(false);
 
     if (failed) {
-        return <div className={`flex items-center justify-center rounded-full bg-baseBackgroundL3 text-accentBlue text-xs font-medium uppercase ${className ?? ""}`}>
+        return <div className={`flex items-center justify-center rounded-full bg-muted text-xs font-semibold uppercase text-muted-foreground ${className ?? ""}`}>
             {asset.slice(0, 1)}
         </div>;
     }

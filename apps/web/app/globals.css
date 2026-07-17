@@ -2,21 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-/* The exchange UI is dark-only: keep text light regardless of the
-   OS color scheme, otherwise light-mode users get black-on-black text. */
+/* Neutral monochrome tokens. The chrome stays grayscale so green and red
+   are reserved for market data: prices, deltas, depth and candles.
+   The UI is dark-only, so the tokens are not scheme-dependent. */
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 0, 0, 0;
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  --muted: 0 0% 14.9%;
+  --muted-foreground: 0 0% 63.9%;
+  --border: 0 0% 14.9%;
+  --up: 157 100% 38%;
+  --down: 359 81% 57%;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: #0e0f14;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
