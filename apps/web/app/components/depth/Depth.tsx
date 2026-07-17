@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getDepth, getKlines, getTicker, getTrades } from "../../utils/httpClient";
+import { getDepth, getTicker, getTrades } from "../../utils/httpClient";
 import { BidTable } from "./BidTable";
 import { AskTable } from "./AskTable";
 import { SignalingManager } from "../../utils/SignalingManager";
@@ -55,19 +55,19 @@ export function Depth({ market }: {market: string}) {
             SignalingManager.getInstance().deRegisterCallback("depth", `DEPTH-${market}`);
         }
     }, [market])
-    
+
     return <div>
         <TableHeader />
         {asks && <AskTable asks={asks} />}
-        {price && <div>{price}</div>}
+        {price && <div className="border-y border-border px-3 py-1.5 font-mono text-sm font-semibold">{price}</div>}
         {bids && <BidTable bids={bids} />}
     </div>
 }
 
 function TableHeader() {
-    return <div className="flex justify-between text-xs">
-    <div className="text-white">Price</div>
-    <div className="text-slate-500">Size</div>
-    <div className="text-slate-500">Total</div>
-</div>
+    return <div className="flex justify-between px-3 py-1 text-xs text-muted-foreground">
+        <div>Price</div>
+        <div>Size</div>
+        <div>Total</div>
+    </div>
 }

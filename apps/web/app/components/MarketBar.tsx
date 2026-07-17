@@ -29,55 +29,34 @@ export const MarketBar = ({market}: {market: string}) => {
             SignalingManager.getInstance().sendMessage({"method":"UNSUBSCRIBE","params":[`ticker.${market}`]}	);
         }
     }, [market])
-    // 
 
-    return <div>
-        <div className="flex items-center flex-row relative w-full overflow-hidden border-b border-slate-800">
-            <div className="flex items-center justify-between flex-row no-scrollbar overflow-auto pr-4">
-                    <TickerSymbol market={market} />
-                    <div className="flex items-center flex-row space-x-8 pl-4">
-                        <div className="flex flex-col h-full justify-center">
-                            <p className={`font-medium tabular-nums text-greenText text-md text-green-500`}>${ticker?.lastPrice}</p>
-                            <p className="font-medium text-sm text-sm tabular-nums">${ticker?.lastPrice}</p>
-                        </div>
-                        <div className="flex flex-col">
-                            <p className={`font-medium text-xs text-slate-400 text-sm`}>24H Change</p>
-                            <p className={` text-sm font-medium tabular-nums leading-5 text-sm text-greenText ${Number(ticker?.priceChange) > 0 ? "text-green-500" : "text-red-500"}`}>{Number(ticker?.priceChange) > 0 ? "+" : ""} {ticker?.priceChange} {(Number(ticker?.priceChangePercent) * 100).toFixed(2)}%</p></div><div className="flex flex-col">
-                                <p className="font-medium text-xs text-slate-400 text-sm">24H High</p>
-                                <p className="text-sm font-medium tabular-nums leading-5 text-sm ">{ticker?.high}</p>
-                                </div>
-                                <div className="flex flex-col">
-                                    <p className="font-medium text-xs text-slate-400 text-sm">24H Low</p>
-                                    <p className="text-sm font-medium tabular-nums leading-5 text-sm ">{ticker?.low}</p>
-                                </div>
-                            <button type="button" className="font-medium transition-opacity hover:opacity-80 hover:cursor-pointer text-base text-left" data-rac="">
-                                <div className="flex flex-col">
-                                    <p className="font-medium text-xs text-slate-400 text-sm">24H Volume</p>
-                                    <p className="mt-1 text-sm font-medium tabular-nums leading-5 text-sm ">{ticker?.volume}
-                                </p>
-                            </div>
-                        </button>
-                    </div>
-                </div>
+    const up = Number(ticker?.priceChange) >= 0;
+
+    return <div className="flex h-14 flex-row items-center gap-8 overflow-x-auto border-b border-border px-4 no-scrollbar">
+        <div className="flex flex-none items-center gap-3">
+            <div className="flex flex-row">
+                <CoinLogo asset={baseAsset(market)} className="z-10 h-6 w-6" />
+                <CoinLogo asset={quoteAsset(market)} className="-ml-2 h-6 w-6" />
             </div>
+            <p className="text-sm font-semibold tracking-tight">{market.replace("_", " / ")}</p>
         </div>
-
+        <p className={`flex-none font-mono text-lg font-medium tabular-nums ${up ? "text-up" : "text-down"}`}>
+            {ticker ? `$${ticker.lastPrice}` : "—"}
+        </p>
+        <Stat
+            label="24h Change"
+            value={ticker ? `${up ? "+" : ""}${ticker.priceChange} (${(Number(ticker.priceChangePercent) * 100).toFixed(2)}%)` : "—"}
+            tone={up ? "text-up" : "text-down"}
+        />
+        <Stat label="24h High" value={ticker?.high ?? "—"} />
+        <Stat label="24h Low" value={ticker?.low ?? "—"} />
+        <Stat label="24h Volume" value={ticker?.volume ?? "—"} />
+    </div>
 }
 
-function TickerSymbol({market}: {market: string}) {
-    return <div className="flex h-[60px] shrink-0 space-x-4">
-        <div className="flex flex-row relative ml-2 -mr-4">
-            <CoinLogo asset={baseAsset(market)} className="z-10 h-6 w-6 mt-4 outline-baseBackgroundL1" />
-            <CoinLogo asset={quoteAsset(market)} className="h-6 w-6 -ml-2 mt-4" />
-        </div>
-        <button type="button" className="react-aria-Button" data-rac="">
-            <div className="flex items-center justify-between flex-row cursor-pointer rounded-lg p-3 hover:opacity-80">
-                <div className="flex items-center flex-row gap-2 undefined">
-                    <div className="flex flex-row relative">
-                        <p className="font-medium text-sm undefined">{market.replace("_", " / ")}</p>
-                    </div>
-                </div>
-            </div>
-        </button>
+function Stat({ label, value, tone }: { label: string, value: string, tone?: string }) {
+    return <div className="flex flex-none flex-col justify-center">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className={`font-mono text-sm tabular-nums ${tone ?? ""}`}>{value}</p>
     </div>
 }

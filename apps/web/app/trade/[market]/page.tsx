@@ -10,20 +10,17 @@ export default function Page() {
     return <div className="flex flex-row flex-1">
         <div className="flex flex-col flex-1">
             <MarketBar market={market as string} />
-            <div className="flex flex-row h-[920px] border-y border-slate-800">
+            <div className="flex h-[720px] flex-row border-b border-border">
                 <div className="flex flex-col flex-1">
                     <TradeView market={market as string} />
                 </div>
-                <div className="flex flex-col w-[250px] overflow-hidden">
+                <div className="flex w-[250px] flex-col overflow-hidden border-l border-border">
                     <BookTrades market={market as string} />
                 </div>
             </div>
         </div>
-        <div className="w-[10px] flex-col border-slate-800 border-l"></div>
-        <div>
-            <div className="flex flex-col w-[250px]">
-                <SwapUI market={market as string} />
-            </div>
+        <div className="w-[280px] flex-none border-l border-border">
+            <SwapUI market={market as string} />
         </div>
     </div>
 }

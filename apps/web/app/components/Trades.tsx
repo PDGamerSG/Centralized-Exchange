@@ -27,10 +27,10 @@ export function Trades({ market }: { market: string }) {
     }, [market]);
 
     return <div className="flex flex-col grow overflow-y-hidden">
-        <div className="flex justify-between text-xs px-1 py-1">
-            <div className="text-slate-500">Price</div>
-            <div className="text-slate-500">Qty</div>
-            <div className="text-slate-500">Time</div>
+        <div className="flex justify-between px-3 py-1 text-xs text-muted-foreground">
+            <div>Price</div>
+            <div>Qty</div>
+            <div>Time</div>
         </div>
         <div className="flex flex-col overflow-y-auto no-scrollbar">
             {trades.map((t) => <TradeRow key={t.id} trade={t} />)}
@@ -40,10 +40,10 @@ export function Trades({ market }: { market: string }) {
 
 function TradeRow({ trade }: { trade: Trade }) {
     // isBuyerMaker means the aggressor sold into a resting bid, so paint it red.
-    const color = trade.isBuyerMaker ? "text-red-500" : "text-green-500";
-    return <div className="flex justify-between text-xs px-1 py-[2px]">
+    const color = trade.isBuyerMaker ? "text-down" : "text-up";
+    return <div className="flex justify-between px-3 py-[2px] font-mono text-xs">
         <div className={color}>{trade.price}</div>
-        <div className="text-slate-300">{trade.quantity}</div>
-        <div className="text-slate-500">{new Date(trade.timestamp).toLocaleTimeString()}</div>
+        <div className="text-foreground/80">{trade.quantity}</div>
+        <div className="text-muted-foreground">{new Date(trade.timestamp).toLocaleTimeString()}</div>
     </div>;
 }

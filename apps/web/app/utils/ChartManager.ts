@@ -54,11 +54,17 @@ export class ChartManager {
           type: ColorType.Solid,
           color: layout.background,
         },
-        textColor: "white",
+        textColor: layout.color,
       },
     });
     this.chart = chart;
-    this.candleSeries = chart.addCandlestickSeries();
+    this.candleSeries = chart.addCandlestickSeries({
+      upColor: "#00c278",
+      downColor: "#ea383b",
+      wickUpColor: "#00c278",
+      wickDownColor: "#ea383b",
+      borderVisible: false,
+    });
 
     this.candleSeries.setData(
       initialData.map((data) => ({

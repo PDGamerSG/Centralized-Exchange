@@ -29,18 +29,18 @@ function Ask({price, quantity, total, maxTotal}: {price: string, quantity: strin
         left: 0,
         width: `${(100 * total) / maxTotal}%`,
         height: "100%",
-        background: "rgba(228, 75, 68, 0.325)",
+        background: "hsl(359 81% 57% / 0.12)",
         transition: "width 0.3s ease-in-out",
         }}
     ></div>
-    <div className="flex justify-between text-xs w-full">
-        <div>
+    <div className="flex w-full justify-between px-3 py-[2px] font-mono text-xs">
+        <div className="text-down">
             {price}
         </div>
-        <div>
+        <div className="text-foreground/80">
             {quantity}
         </div>
-        <div>
+        <div className="text-muted-foreground">
             {total?.toFixed(2)}
         </div>
     </div>

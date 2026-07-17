@@ -44,8 +44,8 @@ export function TradeView({
         chartRef.current,
         candles,
         {
-          background: "#0e0f14",
-          color: "white",
+          background: "#0a0a0a",
+          color: "#a3a3a3",
         }
       );
       //@ts-ignore
@@ -74,7 +74,7 @@ export function TradeView({
 
   return (
     <>
-      <div ref={chartRef} style={{ height: "520px", width: "100%", marginTop: 4 }}></div>
+      <div ref={chartRef} style={{ height: "100%", width: "100%" }}></div>
     </>
   );
 }
