@@ -19,110 +19,54 @@ export const Markets = () => {
   }, []);
 
   return (
-    <div className="flex flex-col flex-1 max-w-[1280px] w-full">
-      <div className="flex flex-col min-w-[700px] flex-1 w-full">
-        <div className="flex flex-col w-full rounded-lg bg-baseBackgroundL1 px-5 py-3">
-          <table className="w-full table-auto">
-            <MarketHeader />
-            <tbody>
-              {tickers?.map((m) => <MarketRow key={m.symbol} market={m} />)}
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div className="overflow-hidden rounded-2xl border border-border">
+      <table className="w-full table-auto">
+        <MarketHeader />
+        <tbody>
+          {tickers?.map((m) => <MarketRow key={m.symbol} market={m} />)}
+        </tbody>
+      </table>
     </div>
   );
 };
 
 function MarketRow({ market }: { market: Ticker }) {
   const router = useRouter();
+  const up = Number(market.priceChangePercent) >= 0;
   return (
-    <tr className="cursor-pointer border-t border-baseBorderLight hover:bg-white/5 w-full" onClick={() => router.push(`/trade/${market.symbol}`)}>
-      <td className="px-1 py-3">
-        <div className="flex shrink">
-          <div className="flex items-center undefined">
-            <div
-              className="relative flex-none overflow-hidden rounded-full border border-baseBorderMed"
-              style={{ width: "40px", height: "40px" }}
-            >
-              <CoinLogo asset={baseAsset(market.symbol)} className="h-10 w-10" />
-            </div>
-            <div className="ml-4 flex flex-col">
-              <p className="whitespace-nowrap text-base font-medium text-baseTextHighEmphasis">
-                {market.symbol}
-              </p>
-              <div className="flex items-center justify-start flex-row gap-2">
-                <p className="flex-medium text-left text-xs leading-5 text-baseTextMedEmphasis">
-                  {market.symbol}
-                </p>
-              </div>
-            </div>
+    <tr className="cursor-pointer border-t border-border transition-colors duration-300 hover:bg-foreground/5" onClick={() => router.push(`/trade/${market.symbol}`)}>
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-3">
+          <CoinLogo asset={baseAsset(market.symbol)} className="h-9 w-9 flex-none" />
+          <div className="flex flex-col">
+            <p className="whitespace-nowrap font-semibold">{baseAsset(market.symbol)}</p>
+            <p className="whitespace-nowrap text-xs text-muted-foreground">{market.symbol.replace("_", " / ")}</p>
           </div>
         </div>
       </td>
-      <td className="px-1 py-3">
-        <p className="text-base font-medium tabular-nums">{market.lastPrice}</p>
-      </td>
-      <td className="px-1 py-3">
-        <p className="text-base font-medium tabular-nums">{market.high}</p>
-      </td>
-      <td className="px-1 py-3">
-        <p className="text-base font-medium tabular-nums">{market.volume}</p>
-      </td>
-      <td className="px-1 py-3">
-        <p className={`text-base font-medium tabular-nums ${Number(market.priceChangePercent) >= 0 ? "text-green-500" : "text-red-500"}`}>
-          {(Number(market.priceChangePercent) * 100).toFixed(2)} %
-        </p>
+      <td className="px-4 py-3 text-right font-mono text-sm">{market.lastPrice}</td>
+      <td className="px-4 py-3 text-right font-mono text-sm">{market.high}</td>
+      <td className="px-4 py-3 text-right font-mono text-sm">{market.volume}</td>
+      <td className="px-4 py-3 text-right">
+        <span className={`inline-block rounded-full px-2 py-0.5 font-mono text-xs ${up ? "bg-up/10 text-up" : "bg-down/10 text-down"}`}>
+          {up ? "+" : ""}{(Number(market.priceChangePercent) * 100).toFixed(2)}%
+        </span>
       </td>
     </tr>
   );
 }
 
 function MarketHeader() {
+  const thClass = "px-4 py-3 text-xs font-medium text-muted-foreground";
   return (
-      <thead>
-        <tr className="">
-          <th className="px-2 py-3 text-left text-sm font-normal text-baseTextMedEmphasis">
-            <div className="flex items-center gap-1 cursor-pointer select-none">
-              Name<span className="w-[16px]"></span>
-            </div>
-          </th>
-          <th className="px-2 py-3 text-left text-sm font-normal text-baseTextMedEmphasis">
-            <div className="flex items-center gap-1 cursor-pointer select-none">
-              Price<span className="w-[16px]"></span>
-            </div>
-          </th>
-          <th className="px-2 py-3 text-left text-sm font-normal text-baseTextMedEmphasis">
-            <div className="flex items-center gap-1 cursor-pointer select-none">
-              Market Cap<span className="w-[16px]"></span>
-            </div>
-          </th>
-          <th className="px-2 py-3 text-left text-sm font-normal text-baseTextMedEmphasis">
-            <div className="flex items-center gap-1 cursor-pointer select-none">
-              24h Volume
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-arrow-down h-4 w-4"
-              >
-                <path d="M12 5v14"></path>
-                <path d="m19 12-7 7-7-7"></path>
-              </svg>
-            </div>
-          </th>
-          <th className="px-2 py-3 text-left text-sm font-normal text-baseTextMedEmphasis">
-            <div className="flex items-center gap-1 cursor-pointer select-none">
-              24h Change<span className="w-[16px]"></span>
-            </div>
-          </th>
-        </tr>
-      </thead>
+    <thead>
+      <tr>
+        <th className={`${thClass} text-left`}>Name</th>
+        <th className={`${thClass} text-right`}>Price</th>
+        <th className={`${thClass} text-right`}>24h High</th>
+        <th className={`${thClass} text-right`}>24h Volume</th>
+        <th className={`${thClass} text-right`}>24h Change</th>
+      </tr>
+    </thead>
   );
 }
