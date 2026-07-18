@@ -28,7 +28,7 @@ function Bid({ price, quantity, total, maxTotal }: { price: string, quantity: st
             left: 0,
             width: `${(100 * total) / maxTotal}%`,
             height: "100%",
-            background: "hsl(157 100% 38% / 0.12)",
+            background: "hsl(var(--up) / 0.12)",
             transition: "width 0.3s ease-in-out",
             }}
         ></div>

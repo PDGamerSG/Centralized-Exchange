@@ -29,7 +29,7 @@ function Ask({price, quantity, total, maxTotal}: {price: string, quantity: strin
         left: 0,
         width: `${(100 * total) / maxTotal}%`,
         height: "100%",
-        background: "hsl(359 81% 57% / 0.12)",
+        background: "hsl(var(--down) / 0.12)",
         transition: "width 0.3s ease-in-out",
         }}
     ></div>

@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { PrimaryButton, SuccessButton } from "./core/Button"
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "./ThemeToggle";
 
 export const Appbar = () => {
     const route = usePathname();
@@ -31,6 +32,7 @@ export const Appbar = () => {
                 </nav>
             </div>
             <div className="flex items-center gap-2">
+                <ThemeToggle />
                 <SuccessButton>Deposit</SuccessButton>
                 <PrimaryButton>Withdraw</PrimaryButton>
             </div>

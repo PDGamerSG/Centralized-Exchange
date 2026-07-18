@@ -5,6 +5,14 @@ import { KLine } from "../utils/types";
 
 const REFRESH_MS = 30 * 1000;
 
+const chartTheme = () => {
+  const styles = getComputedStyle(document.documentElement);
+  return {
+    background: `hsl(${styles.getPropertyValue("--background")})`,
+    color: `hsl(${styles.getPropertyValue("--muted-foreground")})`,
+  };
+};
+
 export function TradeView({
   market,
 }: {
@@ -43,16 +51,18 @@ export function TradeView({
       const chartManager = new ChartManager(
         chartRef.current,
         candles,
-        {
-          background: "#0a0a0a",
-          color: "#a3a3a3",
-        }
+        chartTheme()
       );
       //@ts-ignore
       chartManagerRef.current = chartManager;
     };
 
     init();
+
+    const onThemeChange = () => {
+      chartManagerRef.current?.applyLayout(chartTheme());
+    };
+    window.addEventListener("themechange", onThemeChange);
 
     const refreshTimer = setInterval(async () => {
       const candles = await fetchCandles();
@@ -64,6 +74,7 @@ export function TradeView({
     return () => {
       disposed = true;
       clearInterval(refreshTimer);
+      window.removeEventListener("themechange", onThemeChange);
       if (chartManagerRef.current) {
         chartManagerRef.current.destroy();
         //@ts-ignore

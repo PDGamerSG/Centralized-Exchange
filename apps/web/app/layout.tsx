@@ -17,8 +17,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${manrope.variable} ${jetbrainsMono.variable} bg-background font-sans text-foreground antialiased`}>
+        {/* Runs before paint so a saved light preference doesn't flash dark. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.theme==="light")document.documentElement.classList.add("light")}catch(e){}`,
+          }}
+        />
         <Appbar />
         {children}
       </body>

@@ -73,6 +73,18 @@ export class ChartManager {
       }))
     );
   }
+  public applyLayout(layout: { background: string; color: string }) {
+    this.chart.applyOptions({
+      layout: {
+        background: {
+          type: ColorType.Solid,
+          color: layout.background,
+        },
+        textColor: layout.color,
+      },
+    });
+  }
+
   public setData(data: any[]) {
     this.candleSeries.setData(
       data.map((point) => ({
