@@ -5,13 +5,21 @@ import { KLine } from "../utils/types";
 
 const REFRESH_MS = 30 * 1000;
 
-const chartTheme = () => {
-  const styles = getComputedStyle(document.documentElement);
-  return {
-    background: `hsl(${styles.getPropertyValue("--background")})`,
-    color: `hsl(${styles.getPropertyValue("--muted-foreground")})`,
-  };
+/* lightweight-charts only parses hex/rgb color strings, so the hsl tokens
+   have to be resolved to rgb by the browser before they reach the chart. */
+const resolveColor = (variable: string) => {
+  const probe = document.createElement("span");
+  probe.style.color = `hsl(var(${variable}))`;
+  document.body.appendChild(probe);
+  const color = getComputedStyle(probe).color;
+  probe.remove();
+  return color;
 };
+
+const chartTheme = () => ({
+  background: resolveColor("--background"),
+  color: resolveColor("--muted-foreground"),
+});
 
 export function TradeView({
   market,
