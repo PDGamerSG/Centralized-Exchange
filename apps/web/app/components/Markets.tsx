@@ -6,8 +6,12 @@ import { getTickers } from "../utils/httpClient";
 import { useRouter } from "next/navigation";
 import { CoinLogo, baseAsset } from "./CoinLogo";
 
+type SortKey = "symbol" | "lastPrice" | "high" | "volume" | "priceChangePercent";
+type Sort = { key: SortKey; dir: "asc" | "desc" };
+
 export const Markets = () => {
   const [tickers, setTickers] = useState<Ticker[]>();
+  const [sort, setSort] = useState<Sort>({ key: "volume", dir: "desc" });
 
   useEffect(() => {
     // The first proxied request after a cold server start can time out,
@@ -18,12 +22,23 @@ export const Markets = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const toggleSort = (key: SortKey) =>
+    setSort((prev) => prev.key === key
+      ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
+      : { key, dir: key === "symbol" ? "asc" : "desc" });
+
+  const sorted = tickers && [...tickers].sort((a, b) => {
+    const flip = sort.dir === "asc" ? 1 : -1;
+    if (sort.key === "symbol") return flip * a.symbol.localeCompare(b.symbol);
+    return flip * (Number(a[sort.key]) - Number(b[sort.key]));
+  });
+
   return (
     <div className="overflow-hidden rounded-2xl border border-border">
       <table className="w-full table-auto">
-        <MarketHeader />
+        <MarketHeader sort={sort} onSort={toggleSort} />
         <tbody>
-          {tickers?.map((m) => <MarketRow key={m.symbol} market={m} />)}
+          {sorted?.map((m) => <MarketRow key={m.symbol} market={m} />)}
         </tbody>
       </table>
     </div>
@@ -56,16 +71,34 @@ function MarketRow({ market }: { market: Ticker }) {
   );
 }
 
-function MarketHeader() {
-  const thClass = "px-4 py-3 text-xs font-medium text-muted-foreground";
+function MarketHeader({ sort, onSort }: { sort: Sort; onSort: (key: SortKey) => void }) {
+  const columns: { label: string; key: SortKey; align: "left" | "right" }[] = [
+    { label: "Name", key: "symbol", align: "left" },
+    { label: "Price", key: "lastPrice", align: "right" },
+    { label: "24h High", key: "high", align: "right" },
+    { label: "24h Volume", key: "volume", align: "right" },
+    { label: "24h Change", key: "priceChangePercent", align: "right" },
+  ];
   return (
     <thead>
       <tr>
-        <th className={`${thClass} text-left`}>Name</th>
-        <th className={`${thClass} text-right`}>Price</th>
-        <th className={`${thClass} text-right`}>24h High</th>
-        <th className={`${thClass} text-right`}>24h Volume</th>
-        <th className={`${thClass} text-right`}>24h Change</th>
+        {columns.map(({ label, key, align }) => {
+          const active = sort.key === key;
+          return (
+            <th key={key} className={`px-4 py-3 text-xs font-medium ${align === "left" ? "text-left" : "text-right"}`}>
+              <button
+                type="button"
+                onClick={() => onSort(key)}
+                className={`inline-flex items-center gap-1 transition-colors duration-300 ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                {label}
+                <span className={`font-mono text-[10px] ${active ? "" : "invisible"}`}>
+                  {active && sort.dir === "asc" ? "↑" : "↓"}
+                </span>
+              </button>
+            </th>
+          );
+        })}
       </tr>
     </thead>
   );
