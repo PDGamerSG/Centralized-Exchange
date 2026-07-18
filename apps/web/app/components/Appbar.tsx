@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { PrimaryButton, SuccessButton } from "./core/Button"
 import { useRouter } from "next/navigation";
@@ -16,7 +17,8 @@ export const Appbar = () => {
         <div className="flex h-14 items-center justify-between px-6">
             <div className="flex items-center gap-8">
                 <div className="flex cursor-pointer items-center gap-2" onClick={() => router.push('/')}>
-                    <span className="text-xl font-extrabold tracking-tighter">Exchange</span>
+                    <Image src="/logo.png" alt="OpenExchange" width={28} height={28} priority />
+                    <span className="text-xl font-extrabold tracking-tighter">OpenExchange</span>
                     <span className="flex items-center gap-1.5 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
                         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-up"></span>
                         live

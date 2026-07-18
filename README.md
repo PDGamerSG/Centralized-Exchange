@@ -1,4 +1,4 @@
-# Centralized Exchange
+# OpenExchange
 
 A toy crypto exchange built as a turborepo monorepo. An in-memory matching engine
 processes orders that arrive over a Redis queue, publishes market data over Redis
