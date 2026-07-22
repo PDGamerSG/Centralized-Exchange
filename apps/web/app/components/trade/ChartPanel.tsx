@@ -19,7 +19,7 @@ const resolveColor = (variable: string) => {
 };
 
 const chartTheme = () => ({
-  background: resolveColor("--background"),
+  background: resolveColor("--card"),
   color: resolveColor("--muted-foreground"),
 });
 

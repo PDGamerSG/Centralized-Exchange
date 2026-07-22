@@ -34,7 +34,7 @@ export const Markets = () => {
   });
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card">
       <table className="w-full table-auto">
         <MarketHeader sort={sort} onSort={toggleSort} />
         <tbody>

@@ -32,7 +32,7 @@ export const MarketBar = ({ market }: { market: string }) => {
 
     const up = Number(ticker?.priceChange) >= 0;
 
-    return <div className="flex h-14 flex-none flex-row items-center gap-8 overflow-x-auto rounded-xl border border-border px-4 no-scrollbar">
+    return <div className="flex h-14 flex-none flex-row items-center gap-8 overflow-x-auto rounded-xl border border-border bg-card px-4 no-scrollbar">
         <div className="flex flex-none items-center gap-3">
             <div className="flex flex-row">
                 <CoinLogo asset={baseAsset(market)} className="z-10 h-6 w-6" />
