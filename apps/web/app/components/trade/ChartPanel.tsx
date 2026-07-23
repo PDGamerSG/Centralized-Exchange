@@ -90,7 +90,7 @@ export function ChartPanel({ market }: { market: string }) {
   }, [market]);
 
   return (
-    <Panel label="Price · 1h candles · 7 days" className="min-w-0 flex-1">
+    <Panel label="Price · 1h candles · 7 days" className="h-[300px] flex-none sm:h-[380px] md:h-[420px] md:min-w-0 md:flex-1 lg:h-auto">
       <div ref={chartRef} className="min-h-0 flex-1" />
     </Panel>
   );

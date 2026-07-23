@@ -32,31 +32,38 @@ export const MarketBar = ({ market }: { market: string }) => {
 
     const up = Number(ticker?.priceChange) >= 0;
 
-    return <div className="flex h-14 flex-none flex-row items-center gap-8 overflow-x-auto rounded-xl border border-border bg-card px-4 no-scrollbar">
-        <div className="flex flex-none items-center gap-3">
-            <div className="flex flex-row">
-                <CoinLogo asset={baseAsset(market)} className="z-10 h-6 w-6" />
-                <CoinLogo asset={quoteAsset(market)} className="-ml-2 h-6 w-6" />
+    /* One scrolling row from lg up. Below that the wrappers lay the same
+       content out as a header row plus a stat grid; `lg:contents` dissolves
+       them again so the desktop row keeps its single flex context. */
+    return <div className="flex flex-none flex-col gap-3 rounded-xl border border-border bg-card p-3 no-scrollbar lg:h-14 lg:flex-row lg:items-center lg:gap-8 lg:overflow-x-auto lg:p-0 lg:px-4">
+        <div className="flex items-center justify-between gap-3 lg:contents">
+            <div className="flex flex-none items-center gap-3">
+                <div className="flex flex-row">
+                    <CoinLogo asset={baseAsset(market)} className="z-10 h-6 w-6" />
+                    <CoinLogo asset={quoteAsset(market)} className="-ml-2 h-6 w-6" />
+                </div>
+                <p className="text-sm font-semibold tracking-tight">{market.replace("_", " / ")}</p>
             </div>
-            <p className="text-sm font-semibold tracking-tight">{market.replace("_", " / ")}</p>
+            <p className={`flex-none font-mono text-lg font-medium tabular-nums ${up ? "text-up" : "text-down"}`}>
+                {ticker ? `$${ticker.lastPrice}` : "—"}
+            </p>
         </div>
-        <p className={`flex-none font-mono text-lg font-medium tabular-nums ${up ? "text-up" : "text-down"}`}>
-            {ticker ? `$${ticker.lastPrice}` : "—"}
-        </p>
-        <Stat
-            label="24h Change"
-            value={ticker ? `${up ? "+" : ""}${ticker.priceChange} (${(Number(ticker.priceChangePercent) * 100).toFixed(2)}%)` : "—"}
-            tone={up ? "text-up" : "text-down"}
-        />
-        <Stat label="24h High" value={ticker?.high ?? "—"} />
-        <Stat label="24h Low" value={ticker?.low ?? "—"} />
-        <Stat label="24h Volume" value={ticker?.volume ?? "—"} />
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4 lg:contents">
+            <Stat
+                label="24h Change"
+                value={ticker ? `${up ? "+" : ""}${ticker.priceChange} (${(Number(ticker.priceChangePercent) * 100).toFixed(2)}%)` : "—"}
+                tone={up ? "text-up" : "text-down"}
+            />
+            <Stat label="24h High" value={ticker?.high ?? "—"} />
+            <Stat label="24h Low" value={ticker?.low ?? "—"} />
+            <Stat label="24h Volume" value={ticker?.volume ?? "—"} />
+        </div>
     </div>
 }
 
 function Stat({ label, value, tone }: { label: string, value: string, tone?: string }) {
-    return <div className="flex flex-none flex-col justify-center">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className={`font-mono text-sm tabular-nums ${tone ?? ""}`}>{value}</p>
+    return <div className="flex min-w-0 flex-none flex-col justify-center">
+        <p className="text-[11px] text-muted-foreground sm:text-xs">{label}</p>
+        <p className={`truncate font-mono text-sm tabular-nums ${tone ?? ""}`}>{value}</p>
     </div>
 }

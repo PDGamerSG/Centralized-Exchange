@@ -1,7 +1,7 @@
 
-export const BidTable = ({ bids }: {bids: [string, string][]}) => {
+export const BidTable = ({ bids, rows = 15 }: {bids: [string, string][], rows?: number}) => {
     let currentTotal = 0;
-    const relevantBids = bids.slice(0, 15);
+    const relevantBids = bids.slice(0, rows);
     const bidsWithTotal: [string, string, number][] = relevantBids.map(([price, quantity]) => [price, quantity, currentTotal += Number(quantity)]);
     const maxTotal = relevantBids.reduce((acc, [_, quantity]) => acc + Number(quantity), 0);
 
@@ -32,14 +32,14 @@ function Bid({ price, quantity, total, maxTotal }: { price: string, quantity: st
             transition: "width 0.3s ease-in-out",
             }}
         ></div>
-            <div className="flex w-full justify-between px-3 py-[2px] font-mono text-xs">
-                <div className="text-up">
+            <div className="grid w-full grid-cols-3 px-3 py-[2px] font-mono text-xs">
+                <div className="truncate text-up">
                     {price}
                 </div>
-                <div className="text-foreground/80">
+                <div className="truncate text-right text-foreground/80">
                     {quantity}
                 </div>
-                <div className="text-muted-foreground">
+                <div className="truncate text-right text-muted-foreground">
                     {total.toFixed(2)}
                 </div>
             </div>

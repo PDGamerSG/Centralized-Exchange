@@ -1,9 +1,9 @@
 
-export const AskTable = ({ asks }: { asks: [string, string][] }) => {
+export const AskTable = ({ asks, rows = 15 }: { asks: [string, string][], rows?: number }) => {
     let currentTotal = 0;
     // Cumulative total grows away from the spread, so accumulate over the
     // best (lowest) asks first, then flip so the best ask sits at the bottom.
-    const relevantAsks = asks.slice(0, 15);
+    const relevantAsks = asks.slice(0, rows);
     const asksWithTotal: [string, string, number][] = relevantAsks.map(([price, quantity]) => [price, quantity, currentTotal += Number(quantity)]);
     const maxTotal = relevantAsks.reduce((acc, [_, quantity]) => acc + Number(quantity), 0);
     asksWithTotal.reverse();
@@ -33,14 +33,14 @@ function Ask({price, quantity, total, maxTotal}: {price: string, quantity: strin
         transition: "width 0.3s ease-in-out",
         }}
     ></div>
-    <div className="flex w-full justify-between px-3 py-[2px] font-mono text-xs">
-        <div className="text-down">
+    <div className="grid w-full grid-cols-3 px-3 py-[2px] font-mono text-xs">
+        <div className="truncate text-down">
             {price}
         </div>
-        <div className="text-foreground/80">
+        <div className="truncate text-right text-foreground/80">
             {quantity}
         </div>
-        <div className="text-muted-foreground">
+        <div className="truncate text-right text-muted-foreground">
             {total?.toFixed(2)}
         </div>
     </div>

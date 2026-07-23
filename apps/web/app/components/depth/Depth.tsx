@@ -10,6 +10,7 @@ export function Depth({ market }: {market: string}) {
     const [bids, setBids] = useState<[string, string][]>();
     const [asks, setAsks] = useState<[string, string][]>();
     const [price, setPrice] = useState<string>();
+    const rows = useDepthRows();
 
     useEffect(() => {
         SignalingManager.getInstance().registerCallback("depth", (data: any) => {
@@ -58,16 +59,33 @@ export function Depth({ market }: {market: string}) {
 
     return <div>
         <TableHeader />
-        {asks && <AskTable asks={asks} />}
+        {asks && <AskTable asks={asks} rows={rows} />}
         {price && <div className="border-y border-border px-3 py-1.5 font-mono text-sm font-semibold">{price}</div>}
-        {bids && <BidTable bids={bids} />}
+        {bids && <BidTable bids={bids} rows={rows} />}
     </div>
 }
 
+/* Only the lg layout gives the book a full-height column. Everywhere else it
+   sits in a 420px panel, which fits seven levels a side — any more and the
+   bids fall below the fold with the spread out of sight. */
+function useDepthRows() {
+    const [rows, setRows] = useState(15);
+
+    useEffect(() => {
+        const tall = window.matchMedia("(min-width: 1024px)");
+        const apply = () => setRows(tall.matches ? 15 : 7);
+        apply();
+        tall.addEventListener("change", apply);
+        return () => tall.removeEventListener("change", apply);
+    }, []);
+
+    return rows;
+}
+
 function TableHeader() {
-    return <div className="flex justify-between px-3 py-1 text-xs text-muted-foreground">
+    return <div className="grid grid-cols-3 px-3 py-1 text-xs text-muted-foreground">
         <div>Price</div>
-        <div>Size</div>
-        <div>Total</div>
+        <div className="text-right">Size</div>
+        <div className="text-right">Total</div>
     </div>
 }

@@ -39,12 +39,12 @@ export function SwapUI({ market }: {market: string}) {
                 <p className="font-mono text-xs text-muted-foreground">≈ {Number.isFinite(total) ? total.toFixed(2) : "0.00"} USDC</p>
             </div>
         </div>
-        <div className="flex justify-center gap-2">
+        <div className="grid grid-cols-4 gap-2">
             {["25%", "50%", "75%", "Max"].map((label) => (
                 <button
                     key={label}
                     type="button"
-                    className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition-colors duration-300 hover:bg-foreground/5 hover:text-foreground"
+                    className="h-9 rounded-full border border-border text-xs text-muted-foreground transition-colors duration-300 hover:bg-foreground/5 hover:text-foreground"
                 >
                     {label}
                 </button>
