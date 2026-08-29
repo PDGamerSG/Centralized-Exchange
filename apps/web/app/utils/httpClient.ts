@@ -3,7 +3,7 @@ import { Depth, KLine, Ticker, Trade } from "./types";
 
 // Live Backpack exchange data, proxied through next.config.mjs rewrites.
 // Point NEXT_PUBLIC_API_URL at http://localhost:3000/api/v1 to use the local exchange instead.
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/backpack-api";
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/backpack-api";
 
 export async function getTicker(market: string): Promise<Ticker> {
     const tickers = await getTickers();
@@ -14,9 +14,26 @@ export async function getTicker(market: string): Promise<Ticker> {
     return ticker;
 }
 
+/* The trade screen asks for the ticker list from three places at once and
+   the markets list polls it every ten seconds. One in-flight request is
+   shared, and its answer is reused for a few seconds after it lands. */
+const TICKERS_TTL_MS = 4000;
+let tickersCache: { at: number; data: Ticker[] } | undefined;
+let tickersInFlight: Promise<Ticker[]> | undefined;
+
 export async function getTickers(): Promise<Ticker[]> {
-    const response = await axios.get(`${BASE_URL}/tickers`);
-    return response.data;
+    if (tickersCache && Date.now() - tickersCache.at < TICKERS_TTL_MS) {
+        return tickersCache.data;
+    }
+    if (!tickersInFlight) {
+        tickersInFlight = axios.get(`${BASE_URL}/tickers`)
+            .then((response) => {
+                tickersCache = { at: Date.now(), data: response.data };
+                return response.data as Ticker[];
+            })
+            .finally(() => { tickersInFlight = undefined; });
+    }
+    return tickersInFlight;
 }
 
 
