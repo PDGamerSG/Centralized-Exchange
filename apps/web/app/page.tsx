@@ -1,13 +1,7 @@
-import { Markets } from "./components/Markets";
+import { redirect } from "next/navigation";
 
+// Markets is the front door; the root path just forwards to it so there is
+// only one copy of the list to maintain.
 export default function Home() {
-  return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:gap-8 sm:px-6 sm:py-12">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-extrabold tracking-tighter sm:text-4xl">Markets</h1>
-        <p className="text-sm text-muted-foreground sm:text-base">Live prices for every listed market.</p>
-      </div>
-      <Markets />
-    </main>
-  );
+  redirect("/markets");
 }
