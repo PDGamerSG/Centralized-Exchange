@@ -1,49 +1,88 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Trade } from "../utils/types";
 import { getTrades } from "../utils/httpClient";
 import { SignalingManager } from "../utils/SignalingManager";
+import { decimalsOf, formatPrice, formatQty, formatTime } from "../utils/format";
+import { baseAsset } from "./CoinLogo";
+import { Skeleton } from "./core/Skeleton";
+import { useOrderForm } from "./trade/orderForm";
 
-const MAX_TRADES = 40;
+const MAX_TRADES = 60;
 
 export function Trades({ market }: { market: string }) {
-    const [trades, setTrades] = useState<Trade[]>([]);
+    const [trades, setTrades] = useState<Trade[]>();
+    const { fillFromBook } = useOrderForm();
 
     useEffect(() => {
+        setTrades(undefined);
         getTrades(market)
             .then((t) => setTrades(t.slice(0, MAX_TRADES)))
-            .catch(() => {});
+            .catch(() => setTrades([]));
 
+        const id = `TRADE-${market}`;
         SignalingManager.getInstance().registerCallback("trade", (trade: Trade) => {
-            setTrades((prev) => [trade, ...prev].slice(0, MAX_TRADES));
-        }, `TRADE-${market}`);
-        SignalingManager.getInstance().sendMessage({ "method": "SUBSCRIBE", "params": [`trade.${market}`] });
+            setTrades((prev) => [trade, ...(prev ?? [])].slice(0, MAX_TRADES));
+        }, id);
+        SignalingManager.getInstance().subscribe(`trade.${market}`);
 
         return () => {
-            SignalingManager.getInstance().sendMessage({ "method": "UNSUBSCRIBE", "params": [`trade.${market}`] });
-            SignalingManager.getInstance().deRegisterCallback("trade", `TRADE-${market}`);
+            SignalingManager.getInstance().unsubscribe(`trade.${market}`);
+            SignalingManager.getInstance().deRegisterCallback("trade", id);
         };
     }, [market]);
 
-    return <div className="flex flex-col grow overflow-y-hidden">
-        <div className="grid flex-none grid-cols-3 px-3 py-1 text-xs text-muted-foreground">
-            <div>Price</div>
-            <div className="text-right">Qty</div>
-            <div className="text-right">Time</div>
+    // One decimal count for the whole column, so sizes line up on the point.
+    const sizeScale = useMemo(() => {
+        let decimals = 0;
+        for (const t of trades?.slice(0, 20) ?? []) decimals = Math.max(decimals, decimalsOf(t.quantity));
+        return Math.min(decimals, 4);
+    }, [trades]);
+
+    return <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex flex-none items-center px-3 py-1.5 text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="flex-1 text-left">Price</span>
+            <span className="flex-1 text-right">Size ({baseAsset(market)})</span>
+            <span className="flex-1 text-right">Time</span>
         </div>
-        <div className="flex flex-col overflow-y-auto no-scrollbar">
-            {trades.map((t) => <TradeRow key={t.id} trade={t} />)}
+        <div className="min-h-0 flex-1 overflow-y-auto no-scrollbar">
+            {!trades && Array.from({ length: 12 }, (_, i) => (
+                <div key={i} className="flex items-center gap-3 px-3 py-1">
+                    <Skeleton className="h-3 flex-1" />
+                    <Skeleton className="h-3 flex-1" />
+                    <Skeleton className="h-3 flex-1" />
+                </div>
+            ))}
+            {trades?.length === 0 && (
+                <p className="px-3 py-8 text-center text-sm text-muted-foreground">No trades yet.</p>
+            )}
+            {trades?.map((t, index) => (
+                <TradeRow key={`${t.id}-${t.timestamp}`} trade={t} fresh={index === 0} sizeDecimals={sizeScale} onSelect={fillFromBook} />
+            ))}
         </div>
     </div>;
 }
 
-function TradeRow({ trade }: { trade: Trade }) {
+function TradeRow({ trade, fresh, sizeDecimals, onSelect }: { trade: Trade; fresh: boolean; sizeDecimals: number; onSelect: (price: string) => void }) {
     // isBuyerMaker means the aggressor sold into a resting bid, so paint it red.
-    const color = trade.isBuyerMaker ? "text-down" : "text-up";
-    return <div className="grid grid-cols-3 px-3 py-[2px] font-mono text-xs">
-        <div className={`truncate ${color}`}>{trade.price}</div>
-        <div className="truncate text-right text-foreground/80">{trade.quantity}</div>
-        <div className="truncate text-right text-muted-foreground">{new Date(trade.timestamp).toLocaleTimeString()}</div>
-    </div>;
+    const sold = trade.isBuyerMaker;
+    return (
+        <button
+            type="button"
+            onClick={() => onSelect(trade.price)}
+            title="Fill this price into the order form"
+            className={`flex w-full items-center px-3 py-[3px] transition-colors duration-150 hover:bg-foreground/[0.06] ${fresh ? (sold ? "flash-down" : "flash-up") : ""}`}
+        >
+            <span className={`flex-1 text-left font-mono text-xs tabular-nums ${sold ? "text-down" : "text-up"}`}>
+                {formatPrice(trade.price)}
+            </span>
+            <span className="flex-1 text-right font-mono text-xs tabular-nums text-foreground/80">
+                {formatQty(trade.quantity, sizeDecimals)}
+            </span>
+            <span className="flex-1 text-right font-mono text-xs tabular-nums text-muted-foreground">
+                {formatTime(trade.timestamp)}
+            </span>
+        </button>
+    );
 }
