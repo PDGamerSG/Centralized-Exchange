@@ -9,9 +9,12 @@
   --background: 0 0% 3.9%;
   --foreground: 0 0% 98%;
   --card: 0 0% 6.7%;
+  /* Popovers and sheets sit above cards, so they get one more step of lift. */
+  --elevated: 0 0% 10.2%;
   --muted: 0 0% 14.9%;
   --muted-foreground: 0 0% 63.9%;
   --border: 0 0% 14.9%;
+  --ring: 0 0% 70%;
   --up: 157 100% 38%;
   --down: 359 81% 57%;
   color-scheme: dark;
@@ -21,9 +24,11 @@
   --background: 0 0% 96.5%;
   --foreground: 0 0% 9%;
   --card: 0 0% 100%;
+  --elevated: 0 0% 100%;
   --muted: 0 0% 92.9%;
   --muted-foreground: 0 0% 40%;
   --border: 0 0% 87%;
+  --ring: 0 0% 40%;
   --up: 157 100% 30%;
   --down: 359 75% 45%;
   color-scheme: light;
@@ -40,11 +45,122 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* One focus treatment for the whole app: a ring only when the keyboard
+   asked for it, so pointer users never see it. */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
 @layer utilities {
   .no-scrollbar {
     scrollbar-width: none;
   }
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Thin scrollbar for panels that scroll on desktop but shouldn't shout. */
+  .thin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .thin-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 999px;
+  }
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* A trade ticking up or down washes its row once. The only motion in the
+     UI that carries information, so it stays and everything else is still. */
+  .flash-up {
+    animation: flash-up 600ms ease-out;
+  }
+  .flash-down {
+    animation: flash-down 600ms ease-out;
+  }
+
+  .animate-rise {
+    animation: rise 200ms ease-out;
+  }
+  .animate-fade {
+    animation: fade 150ms ease-out;
+  }
+}
+
+@keyframes flash-up {
+  from {
+    background-color: hsl(var(--up) / 0.22);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+@keyframes flash-down {
+  from {
+    background-color: hsl(var(--down) / 0.22);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Skeletons: a muted block with a single light sweep across it. */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: hsl(var(--foreground) / 0.06);
+  border-radius: 0.375rem;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.06), transparent);
+  animation: shimmer 1.6s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

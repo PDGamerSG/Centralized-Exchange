@@ -14,6 +14,12 @@ export function quoteAsset(market: string): string {
     return market.split("_")[1] ?? "USDC";
 }
 
+// Backpack lists perpetuals as BASE_QUOTE_PERP alongside the spot pair, so
+// without this the two rows are identical.
+export function isPerp(market: string): boolean {
+    return market.endsWith("_PERP");
+}
+
 export function CoinLogo({ asset, className }: { asset: string, className?: string }) {
     const [failed, setFailed] = useState(false);
 

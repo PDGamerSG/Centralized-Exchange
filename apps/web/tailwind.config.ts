@@ -12,11 +12,13 @@ const config: Config = {
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
         card: "hsl(var(--card) / <alpha-value>)",
+        elevated: "hsl(var(--elevated) / <alpha-value>)",
         muted: {
           DEFAULT: "hsl(var(--muted) / <alpha-value>)",
           foreground: "hsl(var(--muted-foreground) / <alpha-value>)",
         },
         border: "hsl(var(--border) / <alpha-value>)",
+        ring: "hsl(var(--ring) / <alpha-value>)",
         up: "hsl(var(--up) / <alpha-value>)",
         down: "hsl(var(--down) / <alpha-value>)",
       },

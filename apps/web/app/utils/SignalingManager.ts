@@ -13,6 +13,9 @@ export class SignalingManager {
     private callbacks: { [type: string]: CallbackEntry[] } = {};
     private id: number;
     private initialized: boolean = false;
+    // Several panels watch the same stream, so channels are reference
+    // counted: the last one to leave is the one that unsubscribes.
+    private subscriptions: Map<string, number> = new Map();
 
     private constructor() {
         this.ws = new WebSocket(BASE_URL);
@@ -45,13 +48,21 @@ export class SignalingManager {
             }
             this.callbacks[type].forEach(({ callback }) => {
                 if (type === "ticker") {
+                    // `o` is the 24h open, so the change and its percentage
+                    // can be recomputed here rather than going stale on the
+                    // values the REST snapshot happened to carry.
+                    const open = Number(message.data.o);
+                    const close = Number(message.data.c);
                     const newTicker: Partial<Ticker> = {
+                        firstPrice: message.data.o,
                         lastPrice: message.data.c,
                         high: message.data.h,
                         low: message.data.l,
                         volume: message.data.v,
                         quoteVolume: message.data.V,
                         symbol: message.data.s,
+                        priceChange: String(close - open),
+                        priceChangePercent: open ? String((close - open) / open) : "0",
                     }
                     callback(newTicker);
                 }
@@ -70,6 +81,24 @@ export class SignalingManager {
                 }
             });
         }
+    }
+
+    subscribe(channel: string) {
+        const count = this.subscriptions.get(channel) ?? 0;
+        this.subscriptions.set(channel, count + 1);
+        if (count === 0) {
+            this.sendMessage({ method: "SUBSCRIBE", params: [channel] });
+        }
+    }
+
+    unsubscribe(channel: string) {
+        const count = this.subscriptions.get(channel) ?? 0;
+        if (count <= 1) {
+            this.subscriptions.delete(channel);
+            this.sendMessage({ method: "UNSUBSCRIBE", params: [channel] });
+            return;
+        }
+        this.subscriptions.set(channel, count - 1);
     }
 
     sendMessage(message: any) {

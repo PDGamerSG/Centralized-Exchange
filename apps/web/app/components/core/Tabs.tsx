@@ -3,7 +3,7 @@
 export type TabOption<T extends string> = { value: T; label: string; activeClass?: string };
 
 export function Tabs<T extends string>({ options, value, onChange, size = "sm", className = "" }: {
-    options: TabOption<T>[];
+    options: readonly TabOption<T>[];
     value: T;
     onChange: (value: T) => void;
     size?: "sm" | "md";
