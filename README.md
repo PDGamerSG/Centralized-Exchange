@@ -31,7 +31,7 @@ pub/sub, and a set of small services fan that data out to clients and storage.
 | `apps/ws`     | WebSocket server streaming depth/trade updates to subscribers       | 3001 |
 | `apps/db`     | Stores trades in TimescaleDB and refreshes kline materialized views | –    |
 | `apps/mm`     | Market maker bot that keeps the TATA_INR book liquid                | –    |
-| `apps/web`    | Next.js trading UI (orderbook, candlestick chart, swap form)        | 3002 |
+| `apps/web`    | Next.js trading UI (orderbook, candlestick chart, order form)        | 3002 |
 
 ## Getting started
 
@@ -106,18 +106,35 @@ depth) is covered by vitest:
 npm test --workspace=engine
 ```
 
-## Frontend data source
+## Frontend
 
-The web UI shows **live market data from Backpack exchange** (e.g. `SOL_USDC`):
-REST calls are proxied through the Next server (`/backpack-api` rewrite, since
-Backpack sends no CORS headers) and the depth/ticker streams come straight from
-`wss://ws.backpack.exchange`. The local engine/api/ws stack still runs the toy
-`TATA_INR` market; to point the UI at it instead, set:
+The web UI shows **live market data from Backpack exchange** (e.g. `SOL_USDC`).
+The depth, ticker and trade streams come straight from `wss://ws.backpack.exchange`;
+REST calls go through the route handler in `apps/web/app/backpack-api`, which
+refetches them server side. (Backpack sends no CORS headers, and a plain Next
+rewrite forwards the browser's `Origin`/`Referer`/`Sec-Fetch-*` headers, which
+the upstream edge answers with 403 — so the proxy rebuilds the request instead.)
+
+The local engine/api/ws stack still runs the toy `TATA_INR` market; to point the
+UI at it instead — which is also what enables order placement from the form — set:
 
 ```sh
 NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
 NEXT_PUBLIC_WS_URL=ws://localhost:3001
 ```
+
+What the UI does:
+
+- **Markets** (`/markets`) — searchable, sortable list with 24h change, quote
+  volume and a low/high range meter, plus starred markets kept in local storage.
+- **Trade** (`/trade/[market]`) — candlestick chart with 1m–1D intervals and
+  volume, an order book with price grouping, cumulative depth bars, spread and
+  click-to-fill, a recent-trades tape, and a limit/market order ticket.
+- **Responsive by breakpoint** — three columns on desktop, chart beside the book
+  on tablets, and on phones a tabbed panel with a buy/sell bar that opens the
+  order ticket in a bottom sheet. The screen is always exactly one viewport tall.
+- **Themes** — dark by default, light via the toggle; the chart re-reads its
+  colours from the CSS tokens on every switch.
 
 ## Notes
 
