@@ -4,7 +4,10 @@ import "./globals.css";
 import { Appbar } from "./components/Appbar";
 
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-sans" });
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
   title: "OpenExchange",
@@ -16,7 +19,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#111111" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d0d0d" },
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
   ],
 };
@@ -28,13 +31,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${manrope.variable} ${jetbrainsMono.variable} bg-background font-sans text-foreground antialiased`}>
+      <body
+        className={`${manrope.variable} ${jetbrainsMono.variable} bg-background font-sans text-foreground antialiased`}
+      >
         {/* Runs before paint so a saved light preference doesn't flash dark. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `try{if(localStorage.theme==="light")document.documentElement.classList.add("light")}catch(e){}`,
           }}
         />
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <Appbar />
         {children}
       </body>

@@ -6,14 +6,14 @@
    are reserved for market data: prices, deltas, depth and candles.
    Dark is the default scheme; the .light class on <html> flips the tokens. */
 :root {
-  --background: 0 0% 3.9%;
-  --foreground: 0 0% 98%;
-  --card: 0 0% 6.7%;
+  --background: 0 0% 5%;
+  --foreground: 0 0% 94%;
+  --card: 0 0% 7.5%;
   /* Popovers and sheets sit above cards, so they get one more step of lift. */
   --elevated: 0 0% 10.2%;
   --muted: 0 0% 14.9%;
-  --muted-foreground: 0 0% 63.9%;
-  --border: 0 0% 14.9%;
+  --muted-foreground: 0 0% 62%;
+  --border: 0 0% 17%;
   --ring: 0 0% 70%;
   --up: 157 100% 38%;
   --down: 359 81% 57%;
@@ -43,6 +43,61 @@ body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
   -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+select {
+  touch-action: manipulation;
+}
+button:not(:disabled),
+select {
+  cursor: pointer;
+}
+h1,
+h2 {
+  text-wrap: balance;
+}
+section {
+  scroll-margin-top: 6rem;
+}
+
+.market-cell {
+  padding: 16px 12px;
+}
+.market-table thead {
+  background: hsl(var(--foreground) / 0.025);
+}
+.market-table thead .market-cell {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: hsl(var(--foreground));
+  color: hsl(var(--background));
+  border-radius: 8px;
+  transform: translateY(-150%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (min-width: 640px) {
+  .market-cell {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+@media (max-width: 639px) {
+  .market-filter {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }
 
 /* One focus treatment for the whole app: a ring only when the keyboard
@@ -151,7 +206,12 @@ body {
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.06), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--foreground) / 0.06),
+    transparent
+  );
   animation: shimmer 1.6s infinite;
 }
 
